@@ -1,0 +1,36 @@
+RIVE PLACEHOLDER FILE
+
+This is a placeholder for the actual companion_placeholder.riv file.
+
+The Rive file should contain:
+
+1. A character avatar with facial expressions and body animations
+2. A state machine with the following 14 states:
+   - idle (default resting state)
+   - listening (active listening animation)
+   - speaking (mouth movement animation)
+   - thinking (thoughtful expression with optional loading indicator)
+   - happy (joyful expression with animation)
+   - laugh (laughing animation with sound cues)
+   - smirk (playful, sarcastic expression)
+   - blush (embarrassed/shy expression)
+   - sad (downcast expression)
+   - angry (frustrated expression)
+   - shocked (surprised expression)
+   - heart_eyes (affectionate expression)
+   - eye_roll (annoyed/ dismissive expression)
+   - shrug (uncertain/confused expression)
+
+3. State machine inputs should be number-based triggers (0-13) corresponding to the above states
+4. Smooth transitions between all states
+5. Looping animations for continuous states (idle, listening, speaking, thinking)
+6. One-shot animations for emotional states (happy, laugh, etc.)
+
+To create this file:
+1. Use Rive editor (rive.app)
+2. Import or create a character design
+3. Set up state machine with the listed states
+4. Export as .riv file and replace this placeholder
+
+For development, the app will use a fallback animation or static avatar when this file is not a valid Rive animation.
+
