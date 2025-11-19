@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:animate_do/animate_do.dart';
 
 import '../models/message.dart';
+import '../core/rive_controller.dart';
 import '../providers/avatar_state_provider.dart';
 import '../providers/chat_provider.dart';
 import 'chat_bubble.dart';

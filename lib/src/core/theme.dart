@@ -83,7 +83,7 @@ class CompanionTheme {
         elevation: 0,
       ),
 
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: colorScheme.surfaceContainerHighest,
         elevation: 0,
         shape: RoundedRectangleBorder(

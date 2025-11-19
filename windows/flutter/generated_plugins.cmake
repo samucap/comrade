@@ -3,8 +3,6 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  battery_plus
-  record_windows
   rive_common
   sqlite3_flutter_libs
 )

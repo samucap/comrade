@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:rive/rive.dart';
+import 'package:rive/rive.dart' hide LinearGradient;
 
 import '../core/rive_controller.dart';
 import '../providers/avatar_state_provider.dart';
+import '../providers/theme_provider.dart';
 
 /// Avatar widget that displays the Rive character with emotion states
 class AvatarWidget extends HookConsumerWidget {
@@ -19,21 +21,6 @@ class AvatarWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final avatarEmotion = ref.watch(currentAvatarEmotionProvider);
-    final riveController = useMemoized(() => RiveAvatarController(
-      animationController: SimpleAnimation('idle'),
-      stateMachineController: StateMachineController.fromArtboard(
-        Artboard(), // This will be replaced with actual Rive artboard
-        'avatar_state_machine',
-      ),
-    ));
-
-    // Update emotion when it changes
-    useEffect(() {
-      riveController.setEmotion(avatarEmotion);
-      return null;
-    }, [avatarEmotion]);
-
     // Handle pull-down gesture for personality switching
     return GestureDetector(
       onVerticalDragEnd: (details) {
@@ -46,26 +33,14 @@ class AvatarWidget extends HookConsumerWidget {
       child: SizedBox(
         width: width ?? MediaQuery.of(context).size.width * 0.65,
         height: height ?? MediaQuery.of(context).size.height * 0.65,
-        child: _buildAvatarContent(riveController),
+        child: _buildPlaceholderAvatar(),
       ),
-    );
-  }
-
-  /// Build the avatar content - either Rive animation or placeholder
-  Widget _buildAvatarContent(RiveAvatarController controller) {
-    return RiveAnimation.asset(
-      'assets/animations/companion_placeholder.riv',
-      controllers: [controller.animationController, controller.stateMachineController],
-      onInit: (_) {
-        // Animation is ready
-      },
-      placeholder: _buildPlaceholderAvatar(),
     );
   }
 
   /// Build a placeholder avatar when Rive file is not available or loading
   Widget _buildPlaceholderAvatar() {
-    return HookConsumerWidget(
+    return Consumer(
       builder: (context, ref, child) {
         final avatarEmotion = ref.watch(currentAvatarEmotionProvider);
         final colorScheme = Theme.of(context).colorScheme;
@@ -73,12 +48,12 @@ class AvatarWidget extends HookConsumerWidget {
         return Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                colorScheme.primary.withOpacity(0.8),
-                colorScheme.secondary.withOpacity(0.6),
+                Color(0xFF6366F1), // Indigo with opacity will be applied at runtime
+                Color(0xFF8B5CF6), // Purple with opacity will be applied at runtime
               ],
             ),
             boxShadow: [
@@ -146,7 +121,7 @@ RiveAvatarController useAvatarController() {
 
     return RiveAvatarController(
       animationController: animationController,
-      stateMachineController: stateMachineController,
+      stateMachineController: stateMachineController!,
     );
   });
 }

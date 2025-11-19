@@ -56,7 +56,7 @@ class AppDatabase extends _$AppDatabase {
         content: 'Hey there! I\'m your voice companion. How are you feeling today?',
         isUser: false,
         timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
-        emotion: const Value(AvatarEmotion.happy),
+        emotion: const Value(0), // AvatarEmotion.happy
       ),
       MessagesCompanion.insert(
         content: 'I\'m doing great, thanks for asking! This is such a cool app.',
@@ -67,7 +67,7 @@ class AppDatabase extends _$AppDatabase {
         content: 'That\'s awesome! I\'m glad you\'re enjoying our conversation. What would you like to talk about?',
         isUser: false,
         timestamp: DateTime.now().subtract(const Duration(minutes: 3)),
-        emotion: const Value(AvatarEmotion.smirk),
+        emotion: const Value(1), // AvatarEmotion.smirk
       ),
       MessagesCompanion.insert(
         content: 'Tell me something interesting about yourself!',
@@ -78,7 +78,7 @@ class AppDatabase extends _$AppDatabase {
         content: 'Well, I love learning new things and having meaningful conversations. My favorite hobbies include listening to music and exploring new ideas!',
         isUser: false,
         timestamp: DateTime.now().subtract(const Duration(minutes: 1)),
-        emotion: const Value(AvatarEmotion.heartEyes),
+        emotion: const Value(4), // AvatarEmotion.heartEyes
       ),
     ];
 
@@ -95,9 +95,6 @@ class Messages extends Table {
   BoolColumn get isUser => boolean()();
   DateTimeColumn get timestamp => dateTime()();
   IntColumn get emotion => integer().nullable()();
-
-  @override
-  Set<Column> get primaryKey => {id};
 }
 
 /// Extension to convert between AvatarEmotion enum and database int

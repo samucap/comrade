@@ -40,7 +40,7 @@ class ChatRepository {
       content: content,
       isUser: false,
       timestamp: DateTime.now(),
-      emotion: emotion != null ? Value(emotion) : const Value.absent(),
+      emotion: emotion != null ? Value(emotion.index) : const Value.absent(),
     );
 
     final id = await _database.insertMessage(companion);
@@ -113,7 +113,7 @@ class ChatMessage {
       content: content,
       isUser: isUser,
       timestamp: timestamp,
-      emotion: emotion != null ? Value(emotion!) : const Value.absent(),
+      emotion: emotion != null ? Value(emotion!.index) : const Value.absent(),
     );
   }
 

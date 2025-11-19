@@ -3,13 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:battery_plus/battery_plus.dart';
 
 import 'widgets/avatar_widget.dart';
 import 'widgets/message_list.dart';
 import 'widgets/mic_button.dart';
 import 'widgets/particles_background.dart';
 import 'core/theme.dart';
+import 'providers/theme_provider.dart';
 
 /// Main application widget with immersive voice companion interface
 class CompanionApp extends HookConsumerWidget {
@@ -20,31 +20,8 @@ class CompanionApp extends HookConsumerWidget {
     final theme = ref.watch(currentThemeProvider);
     final personality = ref.watch(currentPersonalityProvider);
 
-    // Battery monitoring for performance optimization
-    final battery = useMemoized(() => Battery());
-    final batteryLevel = useState<int>(100);
+    // Battery monitoring temporarily disabled
     final isLowBattery = useState<bool>(false);
-
-    // Monitor battery level
-    useEffect(() {
-      void updateBatteryLevel() async {
-        try {
-          final level = await battery.batteryLevel;
-          batteryLevel.value = level;
-          isLowBattery.value = level <= 5; // 5% threshold for low battery
-        } catch (e) {
-          // Battery monitoring not available
-        }
-      }
-
-      updateBatteryLevel();
-
-      final subscription = battery.onBatteryStateChanged.listen((state) {
-        updateBatteryLevel();
-      });
-
-      return subscription.cancel;
-    }, []);
 
     // Configure system UI for immersive experience
     useEffect(() {
@@ -217,121 +194,33 @@ class CompanionApp extends HookConsumerWidget {
 }
 
 /// Performance optimized app wrapper
-class PerformanceOptimizedApp extends HookConsumerWidget {
+class PerformanceOptimizedApp extends StatelessWidget {
   const PerformanceOptimizedApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final battery = useMemoized(() => Battery());
-    final batteryLevel = useState<int>(100);
-
-    // Monitor battery for FPS optimization
-    useEffect(() {
-      void checkBattery() async {
-        try {
-          final level = await battery.batteryLevel;
-          batteryLevel.value = level;
-        } catch (e) {
-          // Battery monitoring not available
-        }
-      }
-
-      checkBattery();
-
-      final subscription = battery.onBatteryStateChanged.listen((state) {
-        checkBattery();
-      });
-
-      return subscription.cancel;
-    }, []);
-
-    // Reduce FPS when battery is low
-    final targetFps = batteryLevel.value <= 5 ? 30 : 60;
-
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 60, end: targetFps.toDouble()),
-      duration: const Duration(milliseconds: 500),
-      builder: (context, fps, child) {
-        // Note: In a real app, you would use a custom render loop
-        // or platform-specific APIs to actually control FPS
-        return child!;
-      },
-      child: const CompanionApp(),
-    );
+  Widget build(BuildContext context) {
+    // Battery monitoring temporarily disabled
+    return const CompanionApp();
   }
 }
 
-/// App with battery-aware particle system
-class BatteryAwareApp extends HookConsumerWidget {
+/// App with battery-aware particle system (temporarily disabled)
+class BatteryAwareApp extends StatelessWidget {
   const BatteryAwareApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final battery = useMemoized(() => Battery());
-    final batteryLevel = useState<int>(100);
-    final particlesEnabled = useState<bool>(true);
-
-    useEffect(() {
-      void updateBatteryState() async {
-        try {
-          final level = await battery.batteryLevel;
-          batteryLevel.value = level;
-          // Disable particles when battery is critically low
-          particlesEnabled.value = level > 5;
-        } catch (e) {
-          // Battery monitoring not available, keep particles enabled
-          particlesEnabled.value = true;
-        }
-      }
-
-      updateBatteryState();
-
-      final subscription = battery.onBatteryStateChanged.listen((state) {
-        updateBatteryState();
-      });
-
-      return subscription.cancel;
-    }, []);
-
-    return ProviderScope(
-      overrides: [
-        // Override particle system based on battery
-        // Note: This would need to be implemented as a proper provider override
-      ],
-      child: const CompanionApp(),
-    );
+  Widget build(BuildContext context) {
+    // Battery monitoring temporarily disabled
+    return const CompanionApp();
   }
 }
 
-/// Hook for battery-aware performance optimization
+/// Hook for battery-aware performance optimization (temporarily disabled)
 BatteryInfo useBatteryOptimization() {
-  final battery = useMemoized(() => Battery());
-  final batteryLevel = useState<int>(100);
-  final isLowPower = useState<bool>(false);
-
-  useEffect(() {
-    void checkBattery() async {
-      try {
-        final level = await battery.batteryLevel;
-        batteryLevel.value = level;
-        isLowPower.value = level <= 5;
-      } catch (e) {
-        isLowPower.value = false;
-      }
-    }
-
-    checkBattery();
-
-    final subscription = battery.onBatteryStateChanged.listen((state) {
-      checkBattery();
-    });
-
-    return subscription.cancel;
-  }, []);
-
-  return BatteryInfo(
-    level: batteryLevel.value,
-    isLowPower: isLowPower.value,
+  // Battery monitoring temporarily disabled
+  return const BatteryInfo(
+    level: 100,
+    isLowPower: false,
   );
 }
 
