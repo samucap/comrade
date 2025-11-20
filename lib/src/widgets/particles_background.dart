@@ -1,311 +1,297 @@
-import 'dart:async';
-import 'dart:math';
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'dart:math' as math;
 
-/// Particle system for background animation
-class ParticlesBackground extends HookConsumerWidget {
-  const ParticlesBackground({
+/// Premium minimal background inspired by Lusion.co aesthetic
+class PremiumBackground extends StatelessWidget {
+  const PremiumBackground({
     super.key,
-    this.enabled = true,
-    this.particleCount = 50,
-    this.maxSpeed = 0.5,
-    this.particleSize = 2.0,
+    this.isDark = false,
   });
 
-  final bool enabled;
-  final int particleCount;
-  final double maxSpeed;
-  final double particleSize;
+  final bool isDark;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    if (!enabled) return const SizedBox.shrink();
-
-    return HookBuilder(
-      builder: (context) {
-        final particles = useMemoized(() => _generateParticles(particleCount));
-        final animationController = useAnimationController(
-          duration: const Duration(seconds: 10),
-        )..repeat();
-
-        useEffect(() {
-          animationController.repeat();
-          return null;
-        }, []);
-
-        return AnimatedBuilder(
-          animation: animationController,
-          builder: (context, child) {
-            return CustomPaint(
-              painter: ParticlesPainter(
-                particles: particles,
-                animationValue: animationController.value,
-                maxSpeed: maxSpeed,
-                particleSize: particleSize,
-              ),
-              size: Size.infinite,
-            );
-          },
-        );
-      },
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Stack(
+      children: [
+        // Base color
+        Container(
+          color: colorScheme.surface,
+        ),
+        
+        // Subtle radial gradient
+        Container(
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              center: Alignment.topRight,
+              radius: 1.5,
+              colors: [
+                colorScheme.onSurface.withOpacity(0.015),
+                colorScheme.surface,
+              ],
+            ),
+          ),
+        ),
+        
+        // Ambient gradient overlay
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                colorScheme.surface,
+                colorScheme.onSurface.withOpacity(0.01),
+                colorScheme.surface,
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
+          ),
+        ),
+        
+        // Subtle noise texture overlay
+        CustomPaint(
+          painter: NoiseTexturePainter(
+            color: colorScheme.onSurface,
+            opacity: 0.02,
+          ),
+          size: Size.infinite,
+        ),
+      ],
     );
   }
-
-  List<Particle> _generateParticles(int count) {
-    final random = Random();
-    final particles = <Particle>[];
-
-    for (int i = 0; i < count; i++) {
-      particles.add(Particle(
-        position: Offset(
-          random.nextDouble() * 1000, // Will be scaled in painter
-          random.nextDouble() * 2000, // Will be scaled in painter
-        ),
-        velocity: Offset(
-          (random.nextDouble() - 0.5) * maxSpeed,
-          (random.nextDouble() - 0.5) * maxSpeed,
-        ),
-        size: random.nextDouble() * particleSize + 0.5,
-        opacity: random.nextDouble() * 0.6 + 0.2,
-        color: HSVColor.fromAHSV(
-          random.nextDouble() * 0.3 + 0.1, // Low opacity
-          random.nextDouble() * 360, // Hue
-          0.8, // Saturation
-          1.0, // Value
-        ).toColor(),
-      ));
-    }
-
-    return particles;
-  }
 }
 
-/// Individual particle data
-class Particle {
-  Particle({
-    required this.position,
-    required this.velocity,
-    required this.size,
-    required this.opacity,
+/// Noise texture painter for premium texture effect
+class NoiseTexturePainter extends CustomPainter {
+  NoiseTexturePainter({
     required this.color,
+    this.opacity = 0.02,
   });
 
-  final Offset position;
-  final Offset velocity;
-  final double size;
-  final double opacity;
   final Color color;
-}
-
-/// Custom painter for rendering particles
-class ParticlesPainter extends CustomPainter {
-  ParticlesPainter({
-    required this.particles,
-    required this.animationValue,
-    required this.maxSpeed,
-    required this.particleSize,
-  });
-
-  final List<Particle> particles;
-  final double animationValue;
-  final double maxSpeed;
-  final double particleSize;
+  final double opacity;
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (final particle in particles) {
-      // Update particle position based on animation
-      final animatedX = (particle.position.dx + particle.velocity.dx * animationValue * 100) % size.width;
-      final animatedY = (particle.position.dy + particle.velocity.dy * animationValue * 100) % size.height;
+    final paint = Paint()
+      ..color = color.withOpacity(opacity)
+      ..strokeWidth = 1;
 
-      // Wrap around screen edges
-      final wrappedX = animatedX < 0 ? animatedX + size.width : animatedX;
-      final wrappedY = animatedY < 0 ? animatedY + size.height : animatedY;
-
-      final position = Offset(wrappedX, wrappedY);
-
-      // Draw particle
-      final paint = Paint()
-        ..color = particle.color.withOpacity(particle.opacity)
-        ..style = PaintingStyle.fill;
-
-      canvas.drawCircle(position, particle.size, paint);
-
-      // Add subtle glow effect
-      final glowPaint = Paint()
-        ..color = particle.color.withOpacity(particle.opacity * 0.3)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
-
-      canvas.drawCircle(position, particle.size * 2, glowPaint);
+    final random = math.Random(42); // Fixed seed for consistency
+    
+    // Draw subtle noise pattern
+    for (var i = 0; i < size.width * size.height / 100; i++) {
+      final x = random.nextDouble() * size.width;
+      final y = random.nextDouble() * size.height;
+      canvas.drawCircle(Offset(x, y), 0.5, paint);
     }
   }
 
   @override
-  bool shouldRepaint(ParticlesPainter oldDelegate) {
-    return animationValue != oldDelegate.animationValue ||
-           particles != oldDelegate.particles;
+  bool shouldRepaint(NoiseTexturePainter oldDelegate) =>
+      color != oldDelegate.color || opacity != oldDelegate.opacity;
+}
+
+/// Minimal gradient background
+class MinimalGradientBackground extends StatelessWidget {
+  const MinimalGradientBackground({
+    super.key,
+    this.colors,
+  });
+
+  final List<Color>? colors;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: colors ?? [
+            colorScheme.surface,
+            colorScheme.surface.withOpacity(0.95),
+            colorScheme.onSurface.withOpacity(0.02),
+          ],
+        ),
+      ),
+    );
   }
 }
 
-/// Floating particles with physics simulation
-class FloatingParticles extends HookConsumerWidget {
-  const FloatingParticles({
+/// Elegant mesh gradient background
+class MeshGradientBackground extends StatelessWidget {
+  const MeshGradientBackground({
     super.key,
-    this.enabled = true,
-    this.particleCount = 30,
-    this.gravity = 0.1,
-    this.windStrength = 0.05,
   });
 
-  final bool enabled;
-  final int particleCount;
-  final double gravity;
-  final double windStrength;
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return CustomPaint(
+      painter: MeshGradientPainter(
+        baseColor: colorScheme.surface,
+        accentColor: colorScheme.onSurface,
+      ),
+      size: Size.infinite,
+    );
+  }
+}
+
+/// Mesh gradient painter for sophisticated background
+class MeshGradientPainter extends CustomPainter {
+  MeshGradientPainter({
+    required this.baseColor,
+    required this.accentColor,
+  });
+
+  final Color baseColor;
+  final Color accentColor;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    if (!enabled) return const SizedBox.shrink();
+  void paint(Canvas canvas, Size size) {
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+    
+    // Base layer
+    canvas.drawRect(rect, Paint()..color = baseColor);
+    
+    // Radial gradients for mesh effect
+    _createRadialGradient(
+      center: Offset(size.width * 0.2, size.height * 0.3),
+      radius: size.width * 0.5,
+      canvas: canvas,
+    );
+    _createRadialGradient(
+      center: Offset(size.width * 0.8, size.height * 0.6),
+      radius: size.width * 0.4,
+      canvas: canvas,
+    );
+    _createRadialGradient(
+      center: Offset(size.width * 0.5, size.height * 0.9),
+      radius: size.width * 0.3,
+      canvas: canvas,
+    );
+  }
 
-    return HookBuilder(
-      builder: (context) {
-        final particles = useState(_generateFloatingParticles(particleCount));
-        final lastUpdate = useRef(DateTime.now());
+  void _createRadialGradient({
+    required Offset center,
+    required double radius,
+    required Canvas canvas,
+  }) {
+    final gradient = RadialGradient(
+      center: Alignment.center,
+      radius: 1.0,
+      colors: [
+        accentColor.withOpacity(0.03),
+        accentColor.withOpacity(0.0),
+      ],
+    );
+    
+    final paint = Paint()
+      ..shader = gradient.createShader(
+        Rect.fromCircle(center: center, radius: radius),
+      );
+    
+    canvas.drawCircle(center, radius, paint);
+  }
 
-        useEffect(() {
-          final timer = Timer.periodic(const Duration(milliseconds: 16), (_) {
-            final now = DateTime.now();
-            final deltaTime = now.difference(lastUpdate.value).inMilliseconds / 1000.0;
-            lastUpdate.value = now;
+  @override
+  bool shouldRepaint(MeshGradientPainter oldDelegate) =>
+      baseColor != oldDelegate.baseColor || accentColor != oldDelegate.accentColor;
+}
 
-            particles.value = _updateParticles(particles.value, deltaTime);
-          });
+/// Animated subtle background with breathing effect
+class AnimatedPremiumBackground extends StatefulWidget {
+  const AnimatedPremiumBackground({
+    super.key,
+  });
 
-          return timer.cancel;
-        }, []);
+  @override
+  State<AnimatedPremiumBackground> createState() => _AnimatedPremiumBackgroundState();
+}
 
+class _AnimatedPremiumBackgroundState extends State<AnimatedPremiumBackground>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 8),
+      vsync: this,
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
         return CustomPaint(
-          painter: FloatingParticlesPainter(particles: particles.value),
+          painter: BreathingBackgroundPainter(
+            progress: _controller.value,
+            baseColor: Theme.of(context).colorScheme.surface,
+            accentColor: Theme.of(context).colorScheme.onSurface,
+          ),
           size: Size.infinite,
         );
       },
     );
   }
-
-  List<FloatingParticle> _generateFloatingParticles(int count) {
-    final random = Random();
-    final particles = <FloatingParticle>[];
-
-    for (int i = 0; i < count; i++) {
-      particles.add(FloatingParticle(
-        position: Offset(
-          random.nextDouble() * 1000,
-          random.nextDouble() * 1000,
-        ),
-        velocity: Offset(
-          (random.nextDouble() - 0.5) * windStrength * 2,
-          random.nextDouble() * -0.5, // Start with upward motion
-        ),
-        size: random.nextDouble() * 3 + 1,
-        life: random.nextDouble() * 10 + 5, // 5-15 seconds lifetime
-        maxLife: random.nextDouble() * 10 + 5,
-      ));
-    }
-
-    return particles;
-  }
-
-  List<FloatingParticle> _updateParticles(List<FloatingParticle> particles, double deltaTime) {
-    final random = Random();
-    final updatedParticles = <FloatingParticle>[];
-
-    for (final particle in particles) {
-      var newVelocity = particle.velocity;
-      var newPosition = particle.position;
-      var newLife = particle.life - deltaTime;
-
-      // Apply gravity
-      newVelocity = Offset(
-        newVelocity.dx + (random.nextDouble() - 0.5) * windStrength * deltaTime,
-        newVelocity.dy + gravity * deltaTime,
-      );
-
-      // Update position
-      newPosition = Offset(
-        newPosition.dx + newVelocity.dx,
-        newPosition.dy + newVelocity.dy,
-      );
-
-      // Reset particle if it goes off screen or dies
-      if (newLife <= 0 || newPosition.dy > 2000) {
-        newPosition = Offset(random.nextDouble() * 1000, -10);
-        newVelocity = Offset(
-          (random.nextDouble() - 0.5) * windStrength * 2,
-          random.nextDouble() * -0.5,
-        );
-        newLife = random.nextDouble() * 10 + 5;
-      }
-
-      updatedParticles.add(FloatingParticle(
-        position: newPosition,
-        velocity: newVelocity,
-        size: particle.size,
-        life: newLife,
-        maxLife: particle.maxLife,
-      ));
-    }
-
-    return updatedParticles;
-  }
 }
 
-/// Floating particle with physics
-class FloatingParticle {
-  const FloatingParticle({
-    required this.position,
-    required this.velocity,
-    required this.size,
-    required this.life,
-    required this.maxLife,
+class BreathingBackgroundPainter extends CustomPainter {
+  BreathingBackgroundPainter({
+    required this.progress,
+    required this.baseColor,
+    required this.accentColor,
   });
 
-  final Offset position;
-  final Offset velocity;
-  final double size;
-  final double life;
-  final double maxLife;
-
-  double get opacity => (life / maxLife).clamp(0.0, 1.0);
-}
-
-/// Painter for floating particles
-class FloatingParticlesPainter extends CustomPainter {
-  const FloatingParticlesPainter({required this.particles});
-
-  final List<FloatingParticle> particles;
+  final double progress;
+  final Color baseColor;
+  final Color accentColor;
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (final particle in particles) {
-      final screenPosition = Offset(
-        particle.position.dx % size.width,
-        particle.position.dy % size.height,
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+    canvas.drawRect(rect, Paint()..color = baseColor);
+
+    // Animated radial gradient
+    final center = Offset(size.width * 0.5, size.height * 0.5);
+    final radius = size.width * (0.6 + progress * 0.2);
+
+    final gradient = RadialGradient(
+      colors: [
+        accentColor.withOpacity(0.01 + progress * 0.01),
+        accentColor.withOpacity(0.0),
+      ],
+    );
+
+    final paint = Paint()
+      ..shader = gradient.createShader(
+        Rect.fromCircle(center: center, radius: radius),
       );
 
-      final paint = Paint()
-        ..color = Colors.white.withOpacity(particle.opacity * 0.6)
-        ..style = PaintingStyle.fill;
-
-      canvas.drawCircle(screenPosition, particle.size, paint);
-    }
+    canvas.drawCircle(center, radius, paint);
   }
 
   @override
-  bool shouldRepaint(FloatingParticlesPainter oldDelegate) {
-    return particles != oldDelegate.particles;
-  }
+  bool shouldRepaint(BreathingBackgroundPainter oldDelegate) =>
+      progress != oldDelegate.progress;
 }
 
+// Legacy aliases for backwards compatibility
+typedef ParticlesBackground = PremiumBackground;

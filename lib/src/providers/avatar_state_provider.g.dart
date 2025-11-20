@@ -49,7 +49,7 @@ final avatarEmotionStreamProvider =
 // ignore: unused_element
 typedef AvatarEmotionStreamRef = AutoDisposeStreamProviderRef<AvatarEmotion>;
 String _$avatarStateNotifierHash() =>
-    r'cb850205967cf4dc1e2f7f692df8562d4a900063';
+    r'cc62655f5e49d46edc2621301a920d55b159a311';
 
 /// Provider for managing the current avatar emotion state
 ///

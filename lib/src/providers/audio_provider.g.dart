@@ -44,9 +44,30 @@ final isRecordingAudioProvider = AutoDisposeProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef IsRecordingAudioRef = AutoDisposeProviderRef<bool>;
-String _$audioNotifierHash() => r'eabaf97e5d1443a66d7a0a839cb29667e4e292ec';
+String _$lastRecordingPathHash() => r'e9ac3cc84112d9d69584a919b942e895bdd64669';
 
-/// See also [AudioNotifier].
+/// Provider that returns the last recording path
+///
+/// Copied from [lastRecordingPath].
+@ProviderFor(lastRecordingPath)
+final lastRecordingPathProvider = AutoDisposeProvider<String?>.internal(
+  lastRecordingPath,
+  name: r'lastRecordingPathProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$lastRecordingPathHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef LastRecordingPathRef = AutoDisposeProviderRef<String?>;
+String _$audioNotifierHash() => r'd4a4dbf422764a6da0e0598ae60756e28901e493';
+
+/// Real audio recording provider
+///
+/// Copied from [AudioNotifier].
 @ProviderFor(AudioNotifier)
 final audioNotifierProvider =
     AutoDisposeNotifierProvider<AudioNotifier, AudioState>.internal(

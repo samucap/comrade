@@ -1,45 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rive/rive.dart' hide LinearGradient;
 
 import '../core/rive_controller.dart';
+import '../core/animations.dart';
+import '../core/typography.dart';
 import '../providers/avatar_state_provider.dart';
 import '../providers/theme_provider.dart';
 
-/// Avatar widget that displays the Rive character with emotion states
+/// Premium avatar widget with parallax and smooth transitions
 class AvatarWidget extends HookConsumerWidget {
   const AvatarWidget({
     super.key,
     this.width,
     this.height,
+    this.scrollController,
   });
 
   final double? width;
   final double? height;
+  final ScrollController? scrollController;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Handle pull-down gesture for personality switching
+    final animationController = useAnimationController(
+      duration: LusionDurations.medium,
+    );
+    
+    final bounceController = useAnimationController(
+      duration: LusionDurations.quick,
+    );
+
+    // Handle pull-down gesture for personality switching AND tap for animation
     return GestureDetector(
+      onTap: () {
+        // Trigger random emotion animation on tap
+        HapticFeedback.lightImpact();
+        ref.read(avatarStateNotifierProvider.notifier).triggerRandomEmotion();
+        bounceController.forward(from: 0).then((_) => bounceController.reverse());
+      },
       onVerticalDragEnd: (details) {
         // Detect pull-down gesture (negative velocity = downward)
         if (details.primaryVelocity != null && details.primaryVelocity! < -500) {
-          // Switch personality on pull-down
+          HapticFeedback.mediumImpact();
           ref.read(themeNotifierProvider.notifier).switchPersonality();
+          animationController.forward(from: 0);
         }
       },
-      child: SizedBox(
-        width: width ?? MediaQuery.of(context).size.width * 0.65,
-        height: height ?? MediaQuery.of(context).size.height * 0.65,
-        child: _buildPlaceholderAvatar(),
+      child: AnimatedBuilder(
+        animation: Listenable.merge([animationController, bounceController]),
+        builder: (context, child) {
+          // Combine theme switch scale with bounce scale
+          final themeScale = 1.0 - (animationController.value * 0.05);
+          final bounceScale = 1.0 + (bounceController.value * 0.1);
+          
+          return Transform.scale(
+            scale: themeScale * bounceScale,
+            child: SizedBox(
+              width: width ?? MediaQuery.of(context).size.width * 0.65,
+              height: height ?? MediaQuery.of(context).size.height * 0.65,
+              child: _buildPremiumAvatar(context, ref),
+            ),
+          );
+        },
       ),
     );
   }
 
-  /// Build a placeholder avatar when Rive file is not available or loading
-  Widget _buildPlaceholderAvatar() {
+  /// Build a premium minimalist avatar
+  Widget _buildPremiumAvatar(BuildContext context, WidgetRef ref) {
     return Consumer(
       builder: (context, ref, child) {
         final avatarEmotion = ref.watch(currentAvatarEmotionProvider);
@@ -48,26 +79,19 @@ class AvatarWidget extends HookConsumerWidget {
         return Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF6366F1), // Indigo with opacity will be applied at runtime
-                Color(0xFF8B5CF6), // Purple with opacity will be applied at runtime
-              ],
+            border: Border.all(
+              color: colorScheme.onSurface.withOpacity(0.08),
+              width: 2,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: colorScheme.primary.withOpacity(0.3),
-                blurRadius: 20,
-                spreadRadius: 5,
-              ),
-            ],
+            color: Colors.transparent,
+            boxShadow: LusionElevation.medium,
           ),
-          child: Icon(
-            _getEmotionIcon(avatarEmotion),
-            size: 80,
-            color: colorScheme.onPrimary,
+          child: Center(
+            child: Icon(
+              _getEmotionIcon(avatarEmotion),
+              size: 80,
+              color: colorScheme.onSurface.withOpacity(0.6),
+            ),
           ),
         );
       },

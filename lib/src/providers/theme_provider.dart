@@ -11,15 +11,14 @@ part 'theme_provider.g.dart';
 class ThemeNotifier extends _$ThemeNotifier {
   @override
   Personality build() {
-    // Default to playful personality
-    return Personality.playful;
+    // Default to light theme
+    return Personality.light;
   }
 
   /// Switch to the next personality in the cycle
   void switchPersonality() {
-    final currentIndex = Personality.values.indexOf(state);
-    final nextIndex = (currentIndex + 1) % Personality.values.length;
-    state = Personality.values[nextIndex];
+    // Toggle between light and dark
+    state = state == Personality.light ? Personality.dark : Personality.light;
   }
 
   /// Set a specific personality
