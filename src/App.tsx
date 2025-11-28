@@ -1,14 +1,14 @@
 import { Viewport } from './components/canvas/Viewport';
 import { Header } from './components/overlay/Header';
-import { Inspector } from './components/overlay/Inspector';
+
 import { Shortcuts } from './components/logic/Shortcuts';
 import { Sidebar } from './components/layout/Sidebar';
 import { AssetGrid } from './components/workspace/AssetGrid';
 import { TextTo3D } from './components/generation/TextTo3D';
 import { ImageTo3D } from './components/generation/ImageTo3D';
 import { ViewportToolbar } from './components/canvas/ViewportToolbar';
-import { RiggingPanel } from './components/rigging/RiggingPanel';
-import { AnimationPanel } from './components/animation/AnimationPanel';
+import { EditorLayout } from './components/layout/EditorLayout';
+import { MiniMap } from './components/canvas/MiniMap';
 import useStore from './store/useStore';
 
 function App() {
@@ -23,31 +23,28 @@ function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 relative h-full">
-        {currentView === 'workspace' && <AssetGrid />}
-        {currentView === 'text-to-3d' && <TextTo3D />}
-        {currentView === 'image-to-3d' && <ImageTo3D />}
-        {currentView === 'rigging' && <RiggingPanel />}
-        {currentView === 'animation' && <AnimationPanel />}
+        {currentView === 'library' && <AssetGrid />}
+        {currentView === 'image-gen' && <ImageTo3D />} {/* Placeholder for Image Gen */}
+        {currentView === 'model-gen' && <TextTo3D />} {/* Placeholder for Model Gen */}
 
         {currentView === 'editor' && (
-          <>
-            {/* 3D Viewport Layer */}
-            <div className="absolute inset-0 z-0">
-              <Viewport />
+          <div className="flex w-full h-full">
+            {/* 3D Viewport Area */}
+            <div className="flex-1 relative">
+              <div className="absolute inset-0 z-0">
+                <Viewport />
+              </div>
+
+              <div className="absolute inset-0 z-10 pointer-events-none">
+                <Header />
+                <ViewportToolbar />
+                <MiniMap />
+              </div>
             </div>
 
-            {/* UI Overlay Layer */}
-            <div className="absolute inset-0 z-10 pointer-events-none">
-              {/* Header */}
-              <Header />
-
-              {/* Viewport Toolbar */}
-              <ViewportToolbar />
-
-              {/* Inspector */}
-              <Inspector />
-            </div>
-          </>
+            {/* Right Panel */}
+            <EditorLayout />
+          </div>
         )}
       </main>
     </div>

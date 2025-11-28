@@ -1,4 +1,4 @@
-import { Box, LayoutGrid, Settings, User, Type, Image as ImageIcon, PersonStanding, Clapperboard } from 'lucide-react';
+import { Box, LayoutGrid, Settings, User, Type, Image as ImageIcon } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import useStore from '../../store/useStore';
 import { Tooltip } from '../ui/Tooltip';
@@ -17,42 +17,34 @@ export function Sidebar() {
             {/* Navigation */}
             <nav className="flex flex-col gap-2 w-full px-2">
                 <NavButton
-                    icon={<LayoutGrid className="w-5 h-5" />}
-                    label="Library"
-                    active={currentView === 'workspace'}
-                    onClick={() => setView('workspace')}
-                />
-                <NavButton
-                    icon={<Type className="w-5 h-5" />}
-                    label="Text to 3D"
-                    active={currentView === 'text-to-3d'}
-                    onClick={() => setView('text-to-3d')}
-                />
-                <NavButton
                     icon={<ImageIcon className="w-5 h-5" />}
-                    label="Image to 3D"
-                    active={currentView === 'image-to-3d'}
-                    onClick={() => setView('image-to-3d')}
+                    label="Image Gen"
+                    active={currentView === 'image-gen'}
+                    onClick={() => setView('image-gen')}
                 />
-                <div className="w-full h-px bg-zinc-900 my-1" />
-                <NavButton
-                    icon={<PersonStanding className="w-5 h-5" />}
-                    label="Auto-Rigging"
-                    active={currentView === 'rigging'}
-                    onClick={() => setView('rigging')}
-                />
-                <NavButton
-                    icon={<Clapperboard className="w-5 h-5" />}
-                    label="Animation"
-                    active={currentView === 'animation'}
-                    onClick={() => setView('animation')}
-                />
-                <div className="w-full h-px bg-zinc-900 my-1" />
                 <NavButton
                     icon={<Box className="w-5 h-5" />}
+                    label="3D Model Gen"
+                    active={currentView === 'model-gen'}
+                    onClick={() => setView('model-gen')}
+                />
+
+                <div className="w-full h-px bg-zinc-900 my-1" />
+
+                <NavButton
+                    icon={<LayoutGrid className="w-5 h-5" />}
                     label="Editor"
                     active={currentView === 'editor'}
                     onClick={() => setView('editor')}
+                />
+
+                <div className="w-full h-px bg-zinc-900 my-1" />
+
+                <NavButton
+                    icon={<Type className="w-5 h-5" />}
+                    label="Library"
+                    active={currentView === 'library'}
+                    onClick={() => setView('library')}
                 />
             </nav>
 

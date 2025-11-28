@@ -1,5 +1,5 @@
 export type TransformMode = 'translate' | 'rotate' | 'scale';
-export type ViewMode = 'workspace' | 'editor' | 'text-to-3d' | 'image-to-3d' | 'rigging' | 'animation';
+export type ViewMode = 'image-gen' | 'model-gen' | 'editor' | 'library';
 export type AssetType = 'text-to-3d' | 'image-to-3d' | 'upload';
 export type AssetStatus = 'generating' | 'ready' | 'failed';
 

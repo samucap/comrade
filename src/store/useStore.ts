@@ -1,12 +1,12 @@
 import { create } from 'zustand';
 import { temporal } from 'zundo';
-import type { EditorState, SceneObject, Vector3Data, AnimationState } from '../types/store';
+import type { EditorState, SceneObject, Vector3Data } from '../types/store';
 
 const useStore = create<EditorState>()(
     temporal(
         (set) => ({
             // Workspace State
-            currentView: 'workspace',
+            currentView: 'library',
             assets: [],
 
             // Viewer State
