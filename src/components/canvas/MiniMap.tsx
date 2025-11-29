@@ -4,7 +4,7 @@ export function MiniMap() {
     const sceneObjects = useStore((state) => state.sceneObjects);
 
     return (
-        <div className="absolute bottom-4 left-4 w-48 h-48 border-2 border-zinc-800 bg-black rounded-lg overflow-hidden shadow-lg z-50">
+        <div className="absolute bottom-4 right-4 w-48 h-48 border-2 border-zinc-800 bg-black rounded-lg overflow-hidden shadow-lg z-50">
             <div className="w-full h-full relative bg-zinc-900 grid place-items-center">
                 <div className="absolute inset-0 opacity-20"
                     style={{ backgroundImage: 'radial-gradient(circle, #333 1px, transparent 1px)', backgroundSize: '10px 10px' }}>

@@ -59,6 +59,36 @@ export function ViewportToolbar() {
                         </Button>
                     </Tooltip>
                 </div>
+
+                <div className="w-px h-4 bg-zinc-800 mx-1" />
+
+                {/* Scenery Controls */}
+                <div className="flex gap-1">
+                    <ModeButton
+                        active={environment.scenery === 'none'}
+                        onClick={() => updateEnvironment({ scenery: 'none' })}
+                        icon={<span className="text-[10px] font-bold">OFF</span>}
+                        label="No Scenery"
+                    />
+                    <ModeButton
+                        active={environment.scenery === 'city'}
+                        onClick={() => updateEnvironment({ scenery: 'city' })}
+                        icon={<span className="text-[10px] font-bold">CITY</span>}
+                        label="City Environment"
+                    />
+                    <ModeButton
+                        active={environment.scenery === 'nature'}
+                        onClick={() => updateEnvironment({ scenery: 'nature' })}
+                        icon={<span className="text-[10px] font-bold">NAT</span>}
+                        label="Nature Environment"
+                    />
+                    <ModeButton
+                        active={environment.scenery === 'studio'}
+                        onClick={() => updateEnvironment({ scenery: 'studio' })}
+                        icon={<span className="text-[10px] font-bold">STD</span>}
+                        label="Studio Environment"
+                    />
+                </div>
             </Panel>
         </div>
     );

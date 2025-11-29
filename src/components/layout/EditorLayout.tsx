@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Inspector } from '../overlay/Inspector';
 import { RiggingPanel } from '../rigging/RiggingPanel';
 import { AnimationPanel } from '../animation/AnimationPanel';
+import { AIEditPanel } from '../editor/AIEditPanel';
 
-import { Box, PersonStanding, Clapperboard, Download } from 'lucide-react';
+import { Box, PersonStanding, Clapperboard, Download, Sparkles } from 'lucide-react';
 import { Button } from '../ui/Button';
 
 export function EditorLayout() {
@@ -34,6 +35,12 @@ export function EditorLayout() {
                     >
                         <Clapperboard className="w-4 h-4" /> Animate
                     </button>
+                    <button
+                        onClick={() => setActiveTab('ai-edit')}
+                        className={`flex-1 p-3 flex justify-center items-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors ${activeTab === 'ai-edit' ? 'text-blue-500 bg-zinc-900' : 'text-zinc-500 hover:text-zinc-300'}`}
+                    >
+                        <Sparkles className="w-4 h-4" /> AI Edit
+                    </button>
                 </div>
 
                 {/* Panel Content */}
@@ -41,6 +48,7 @@ export function EditorLayout() {
                     {activeTab === 'inspector' && <Inspector />}
                     {activeTab === 'rigging' && <RiggingPanel />}
                     {activeTab === 'animation' && <AnimationPanel />}
+                    {activeTab === 'ai-edit' && <AIEditPanel />}
                 </div>
 
                 {/* Footer Actions */}

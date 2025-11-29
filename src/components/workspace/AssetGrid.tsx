@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Search, Filter, Trash2, ExternalLink, Box, Image as ImageIcon, Clapperboard } from 'lucide-react';
+import { Search, Filter, Trash2, ExternalLink, Box, Image as ImageIcon, Clapperboard, Upload } from 'lucide-react';
 import useStore from '../../store/useStore';
 import { cn } from '../../lib/utils';
 import type { Asset } from '../../types/store';
 
 export function AssetGrid() {
-    const { assets, removeAsset, addObject } = useStore();
+    const { assets, removeAsset, addObject, addAsset } = useStore();
     const [filter, setFilter] = useState<'all' | 'model' | 'image' | 'animation'>('all');
     const [search, setSearch] = useState('');
 
@@ -38,9 +38,46 @@ export function AssetGrid() {
                             className="w-64 bg-zinc-900 border border-zinc-800 rounded-full py-1.5 pl-9 pr-4 text-sm text-white focus:outline-none focus:border-zinc-700 transition-colors"
                         />
                     </div>
-                    <button className="p-2 hover:bg-zinc-800 rounded-full text-zinc-400 hover:text-white transition-colors">
-                        <Filter className="w-4 h-4" />
-                    </button>
+
+                    <div className="h-6 w-px bg-zinc-800" />
+
+                    <input
+                        type="file"
+                        id="asset-upload"
+                        className="hidden"
+                        accept=".glb,.gltf"
+                        onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+
+                            const name = file.name.split('.')[0];
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const result = e.target?.result as string;
+                                if (!result) return;
+
+                                addObject(result, name);
+                                addAsset({
+                                    id: crypto.randomUUID(),
+                                    name,
+                                    type: 'upload', // Or 'model'
+                                    status: 'ready',
+                                    url: result,
+                                    thumbnail: 'https://images.unsplash.com/photo-1614730341194-75c6074065db?q=80&w=2074&auto=format&fit=crop',
+                                    createdAt: Date.now(),
+                                });
+                            };
+                            reader.readAsDataURL(file);
+                            e.target.value = ''; // Reset
+                        }}
+                    />
+                    <label
+                        htmlFor="asset-upload"
+                        className="flex items-center gap-2 px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-full cursor-pointer transition-colors shadow-lg shadow-blue-900/20"
+                    >
+                        <Upload className="w-4 h-4" />
+                        Import
+                    </label>
                 </div>
             </div>
 
@@ -76,7 +113,7 @@ export function AssetGrid() {
                         <p>No assets found</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                         {filteredAssets.map((asset) => (
                             <AssetCard
                                 key={asset.id}
@@ -84,7 +121,7 @@ export function AssetGrid() {
                                 onRemove={() => removeAsset(asset.id)}
                                 onLoad={() => {
                                     if (asset.url) {
-                                        addObject(asset.url, asset.name);
+                                        addObject(asset.url, asset.name, asset.id);
                                     }
                                 }}
                             />
@@ -101,11 +138,17 @@ function AssetCard({ asset, onRemove, onLoad }: { asset: Asset; onRemove: () => 
         <div className="group relative bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 hover:border-zinc-600 transition-all hover:shadow-xl hover:shadow-black/50">
             {/* Thumbnail */}
             <div className="aspect-square relative overflow-hidden bg-zinc-950">
-                <img
-                    src={asset.thumbnail}
-                    alt={asset.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
+                {asset.thumbnail ? (
+                    <img
+                        src={asset.thumbnail}
+                        alt={asset.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                ) : (
+                    <div className="w-full h-full bg-zinc-900 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                        <Box className="w-12 h-12 text-zinc-700" />
+                    </div>
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
                 {/* Actions Overlay */}
@@ -130,7 +173,7 @@ function AssetCard({ asset, onRemove, onLoad }: { asset: Asset; onRemove: () => 
 
                 {/* Type Badge */}
                 <div className="absolute top-2 left-2 px-2 py-1 bg-black/60 backdrop-blur-sm rounded text-[10px] font-bold uppercase text-white border border-white/10">
-                    {asset.type === 'text-to-3d' ? 'Model' : 'Image'}
+                    {asset.type === 'image-to-3d' ? 'Image' : 'Model'}
                 </div>
             </div>
 

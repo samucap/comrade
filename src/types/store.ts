@@ -1,5 +1,5 @@
 export type TransformMode = 'translate' | 'rotate' | 'scale';
-export type ViewMode = 'image-gen' | 'model-gen' | 'editor' | 'library';
+export type ViewMode = 'home' | 'image-gen' | 'model-gen' | 'editor' | 'library';
 export type AssetType = 'text-to-3d' | 'image-to-3d' | 'upload';
 export type AssetStatus = 'generating' | 'ready' | 'failed';
 
@@ -21,6 +21,7 @@ export interface Asset {
 
 export interface SceneObject {
     id: string;              // UUID v4
+    assetId?: string;        // Link to library asset
     name: string;            // e.g., "MODULE_01"
     src: string;             // URL to .glb asset
     position: Vector3Data;
@@ -36,6 +37,7 @@ export interface EnvironmentSettings {
     gridVisible: boolean;
     background: string;
     lightIntensity: number;
+    scenery: string; // 'none' | 'city' | 'nature' | 'studio' | custom URL
 }
 
 export interface AnimationState {
@@ -59,19 +61,22 @@ export interface EditorState {
     sceneObjects: SceneObject[];
     selectedId: string | null;
     transformMode: TransformMode;
+    capturePending: boolean;
 
     // Actions
     setView: (view: ViewMode) => void;
     addAsset: (asset: Asset) => void;
     removeAsset: (id: string) => void;
+    updateAssetThumbnail: (id: string, thumbnail: string) => void;
 
     setRenderMode: (mode: RenderMode) => void;
     updateEnvironment: (settings: Partial<EnvironmentSettings>) => void;
     updateAnimation: (settings: Partial<AnimationState>) => void;
 
-    addObject: (url: string, name: string) => void;
+    addObject: (url: string, name: string, assetId?: string) => void;
     removeObject: (id: string) => void;
     selectObject: (id: string | null) => void;
     updateObjectTransform: (id: string, prop: 'position' | 'rotation' | 'scale', val: Vector3Data) => void;
     setTransformMode: (mode: TransformMode) => void;
+    setCapturePending: (pending: boolean) => void;
 }
